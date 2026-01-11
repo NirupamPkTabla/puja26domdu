@@ -1,4 +1,4 @@
-import os, secrets, imghdr, csv, io, sys
+import os, secrets, imghdr, csv, io, sys, telepot
 from datetime import datetime
 from flask import (
     Flask, render_template_string, request, redirect, url_for,
@@ -60,6 +60,26 @@ if APP_VERSION == 'STABLE RELEASE':
     print_log("APP_VERSION NOT SET! USING : 'STABLE RELEASE'.")
 
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'}
+
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', 'NO_TOKEN_SET')
+if TELEGRAM_BOT_TOKEN == 'NO_TOKEN_SET':
+    TELEGRAM_ENABLED = False
+    print_log("TELEGRAM_BOT_TOKEN NOT SET! DISABLED TELEGRAM NOTIFICATION.")
+else:
+    TELEGRAM_BOT = telepot.Bot(TELEGRAM_BOT_TOKEN)
+    print_log("CREATED TELEGRAM BOT INSTANCE.")
+    TELEGRAM_ENABLED = os.environ.get('TELEGRAM_ENABLED', '').strip().lower() in ('1', 'true', 'yes')
+    if TELEGRAM_ENABLED:
+        print_log("TELEGRAM NOTIFICATIONS ENABLED.")
+    elif not TELEGRAM_ENABLED:
+        print_log("TELEGRAM_NOTIFICATIONS DISABLED IN ENV FILE.")
+
+TELEGRAM_RECIPIENTS = [item.strip() for item in os.environ.get('TELEGRAM_RECIPIENTS', '').split(',') if item.strip()]
+if not TELEGRAM_RECIPIENTS:
+    TELEGRAM_ENABLED = False
+    print_log("TELEGRAM_RECIPIENTS NOT SET! DISABLED TELEGRAM NOTIFICATION.")
+else:
+    print_log(f"TELEGRAM RECIPIENTS: {', '.join(TELEGRAM_RECIPIENTS)}")
 
 RESET_DB = os.environ.get('RESET_DB', '').strip().lower() in ('1', 'true', 'yes')
 RESET_DB_CONFIRM = os.environ.get('RESET_DB_CONFIRM', '').strip().lower() in ('1', 'true', 'yes')
@@ -195,12 +215,28 @@ def save_receipt_image(file_storage) -> str | None:
     file_storage.save(os.path.join(app.config['UPLOAD_FOLDER'], stored))
     return stored
 
+def send_telegram_message(type="", user="", action="", details=""):
+    if TELEGRAM_ENABLED:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if type == "auditlog":
+            message = f"{timestamp}\nUser: {user}\nAction: {action}\nDetails: {details}"
+        else:
+            message = f"{timestamp}\n{type}"
+        for recipient in TELEGRAM_RECIPIENTS:
+            try:
+                TELEGRAM_BOT.sendMessage(recipient, message)
+            except Exception:
+                continue
+    else:
+        return
+    return
+
 def log_action(action: str, details: str):
     log = AuditLog(user=current_user.username if current_user.is_authenticated else "System",
                    action=action, details=details)
     db.session.add(log)
     db.session.commit()
-
+    send_telegram_message(type="auditlog", user=log.user, action=action, details=details)
 # --- Balance helpers ---
 def get_bank_balance() -> float:
     txs = Transaction.query.all()
@@ -959,4 +995,5 @@ if __name__ == '__main__':
             print_log(f"ADMIN USER CREATED. USERNAME: 'admin' PASSWORD: '{INITIAL_ADMIN_PASSWORD}'")
         else:
             print_log("ADMIN USER ALREADY EXISTS.")
+        send_telegram_message("BANI ARCHANA 2026 SERVER STARTUP COMPLETE.")
     app.run(host=FLASK_HOST, port=FLASK_PORT, debug=FLASK_DEBUG)
