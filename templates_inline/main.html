@@ -13,10 +13,13 @@
       const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       const theme = saved || system;
       document.documentElement.setAttribute('data-bs-theme', theme);
-      const toggleBtn = document.getElementById('themeToggle');
-      if (toggleBtn) {
-        toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
-      }
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) {
+          toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+      });
+
     })();
     function toggleTheme() {
       const current = document.documentElement.getAttribute('data-bs-theme');
@@ -28,23 +31,44 @@
   </script>
   <style>
     :root {
-      --primary: #4f46e5;
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --border: rgba(0,0,0,0.05);
-      --text: #111827;
-      --text-muted: #6b7280;
-      --input-bg: #f1f5f9;
+      /* Light theme – warm white + brown */
+      --primary: #8b5e34;          /* warm brown */
+      --bg: #fdfaf6;               /* soft off-white */
+      --card-bg: #ffffff;          /* pure white cards */
+      --border: rgba(139,94,52,0.15);
+      --text: #2b1d0e;              /* dark coffee */
+      --text-muted: #7a5c3a;       /* muted brown */
+      --input-bg: #faf6f1;
     }
+
     [data-bs-theme="dark"] {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --border: rgba(255,255,255,0.05);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --primary: #6366f1;
-      --input-bg: #334155;
+      /* Dark theme – espresso + cream */
+      --primary: #caa56a;          /* golden brown */
+      --bg: #1b140c;               /* espresso */
+      --card-bg: #241a10;          /* dark brown card */
+      --border: rgba(202,165,106,0.2);
+      --text: #f5efe6;             /* warm cream */
+      --text-muted: #cbb89d;       /* muted cream */
+      --input-bg: #2f2417;
     }
+
+    html,
+    body,
+    .navbar,
+    .card,
+    .table,
+    .form-control,
+    .form-select,
+    .input-group-text,
+    .btn,
+    .toast-msg {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+
     body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); }
     .navbar { background: var(--card-bg) !important; border-bottom: 1px solid var(--border); padding: 0.8rem 1.5rem; }
     .nav-link-custom {
@@ -52,7 +76,8 @@
       padding: 0.5rem 1rem; border-radius: 20px; transition: all 0.2s;
     }
     .nav-link-custom:hover, .nav-link-custom.active {
-      color: var(--primary); background: rgba(79, 70, 229, 0.1); font-weight: 700;
+      color: var(--primary); background: color-mix(in srgb, var(--primary) 15%, transparent);
+ font-weight: 700;
     }
     .card {
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
@@ -82,7 +107,8 @@
     }
     .form-control:focus, .form-select:focus {
       background-color: var(--card-bg); border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent);
+
     }
     .btn-action {
       background: var(--primary); border: none; color: white;
@@ -134,6 +160,70 @@
       transform: scale(1.1);
       transition: transform 0.2s;
     }
+    /* Improve spacing in hamburger menu */
+    @media (max-width: 991.98px) {
+      .navbar-collapse {
+        padding-top: 1rem;
+      }
+
+      .navbar-nav {
+        gap: 0.5rem; /* vertical spacing between items */
+        align-items: stretch;
+      }
+
+      .nav-link-custom {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem 1rem;
+      }
+
+      .navbar-nav .nav-item.ms-3 {
+        margin-left: 0 !important;
+        margin-top: 0.5rem;
+      }
+      .navbar .btn-outline-danger.rounded-circle {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+      }
+
+    }
+    @media (max-width: 991.98px) {
+      .navbar-collapse {
+        background: var(--card-bg);
+        border-radius: 16px;
+        margin-top: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      }
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 10px; /* soft square */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+      background: transparent;
+      border: 1px solid currentColor;
+    }
+    /* Total row background */
+    .total-row {
+      background-color: color-mix(in srgb, var(--primary) 10%, var(--card-bg));
+      font-weight: 700;
+    }
+
+    /* Optional: total row text color */
+    .total-row td {
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -146,9 +236,32 @@
         <span class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Dept. of Music, University of Dhaka</span>
       </div>
     </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="d-flex align-items-center gap-2 ms-auto order-lg-2">
+
+      <button id="themeToggle"
+              onclick="toggleTheme()"
+              class="icon-btn btn-outline-secondary"
+              title="Toggle theme">
+        🌙
+      </button>
+
+      <a href="{{ url_for('logout') }}"
+        class="icon-btn btn-outline-danger"
+        title="Logout">
+        ✕
+      </a>
+    </div>
+
+    <button class="navbar-toggler border-0 order-lg-3"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#nav"
+            aria-controls="nav"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="nav">
       <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item"><a href="/" class="nav-link-custom {{'active' if page=='dashboard'}}">Home</a></li>
@@ -164,12 +277,6 @@
           <li class="nav-item"><a href="/log" class="nav-link-custom {{'active' if page=='log'}}">Log</a></li>
           <li class="nav-item"><a href="/admin" class="nav-link-custom {{'active' if page=='admin'}}">Admin</a></li>
         {% endif %}
-        <li class="nav-item ms-3">
-          <button id="themeToggle" onclick="toggleTheme()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">🌙</button>
-        </li>
-        <li class="nav-item ms-3">
-          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger rounded-pill px-4">Logout</a>
-        </li>
       </ul>
     </div>
   </div>
@@ -191,9 +298,9 @@
     <div class="row g-4 justify-content-center">
       <div class="col-md-6 col-lg-3">
         <div class="card p-4 text-center h-100">
-          <div class="small-label">Cash In Hand</div>
+          <div class="small-label">Cash</div>
           <div class="stat-val text-success">৳{{ "{:,.2f}".format(cash) }}</div>
-          <div class="small text-muted mt-2">Total Income: ৳{{ "{:,.2f}".format(income) }}</div>
+          <div class="small text-muted mt-2">Income: ৳{{ "{:,.2f}".format(income) }}</div>
         </div>
       </div>
       <div class="col-md-6 col-lg-3">
@@ -204,7 +311,7 @@
       </div>
       <div class="col-md-6 col-lg-3">
         <div class="card p-4 text-center h-100">
-          <div class="small-label">Active Advances</div>
+          <div class="small-label">Advances Given</div>
           <div class="stat-val text-warning">৳{{ "{:,.2f}".format(advances_total) }}</div>
         </div>
       </div>
@@ -217,11 +324,9 @@
     </div>
     {% if current_user.role == 'viewer' %}
       <div class="text-center mt-5">
-        <h4 class="fw-bold text-primary">Read-only Viewer Mode</h4>
-        <p class="text-muted lead">You can view the summary above and the Charts page.</p>
       </div>
     {% else %}
-      <button type="button" class="fab" data-bs-toggle="modal" data-bs-target="#newTxModal">NEW</button>
+      <button type="button" class="fab" data-bs-toggle="modal" data-bs-target="#newTxModal">+</button>
       <div class="modal fade" id="newTxModal" tabindex="-1" aria-labelledby="newTxLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
@@ -320,7 +425,7 @@
                     <span>Original: ৳<span id="disp-adv">0</span></span>
                     <span>Spent: ৳<span id="disp-spent">0</span></span>
                   </div>
-                  <div class="text-center mt-2 fw-bold fs-4 text-primary">Balance: ৳<span id="disp-return">0</span></div>
+                  <div class="text-center mt-2 fw-bold fs-4">Balance: ৳<span id="disp-return">0</span></div>
                 </div>
                 <button class="btn-action mt-3">Save Record</button>
               </form>
@@ -449,7 +554,7 @@
 
   {% if page == 'income' %}
     <div class="card">
-      <div class="card-header text-success">Income Breakdown</div>
+      <div class="card-header text-success">Income</div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table mb-0">
@@ -458,9 +563,9 @@
               {% for cat, amt in inc_breakdown.items() %}
                 <tr><td class="ps-4">{{ cat }}</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(amt) }}</td></tr>
               {% endfor %}
-              <tr class="bg-light fw-bold">
+              <tr class="total-row">
                 <td class="ps-4">TOTAL INCOME</td>
-                <td class="text-end pe-4 text-success">৳{{ "{:,.2f}".format(total_inc) }}</td>
+                <td class="text-end pe-4">৳{{ "{:,.2f}".format(total_inc) }}</td>
               </tr>
             </tbody>
           </table>
@@ -471,7 +576,7 @@
 
   {% if page == 'expense' %}
     <div class="card">
-      <div class="card-header text-danger">Expense Breakdown</div>
+      <div class="card-header text-danger">Expense</div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table mb-0">
@@ -481,9 +586,9 @@
                 <tr><td class="ps-4">{{ cat }}</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(amt) }}</td></tr>
               {% endfor %}
               <tr class="text-danger small"><td class="ps-4">+ Bank Withdrawal Fees</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(total_fees) }}</td></tr>
-              <tr class="bg-light fw-bold">
+              <tr class="total-row">
                 <td class="ps-4">TOTAL EXPENSE</td>
-                <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(total_exp) }}</td>
+                <td class="text-end pe-4">৳{{ "{:,.2f}".format(total_exp) }}</td>
               </tr>
             </tbody>
           </table>
@@ -529,8 +634,8 @@
                 <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(t.fee or 0) }}</td>
               </tr>
               {% endfor %}
-              <tr class="bg-light fw-bold">
-                <td colspan="5" class="text-end">TOTAL FEES OWED</td>
+              <tr class="total-row">
+                <td colspan="5" class="text-end">TOTAL FEE</td>
                 <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(total_fees) }}</td>
               </tr>
             </tbody>
@@ -558,9 +663,9 @@
                       <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
                     </tr>
                   {% endfor %}
-                  <tr class="bg-light fw-bold">
-                    <td colspan="3" class="ps-4 text-end">TOTAL OUTSTANDING</td>
-                    <td class="text-end pe-4 text-warning">৳{{ "{:,.2f}".format(total_active) }}</td>
+                  <tr class="total-row">
+                    <td colspan="3" class="ps-4 text-end">TOTAL ACTIVE ADVANCE</td>
+                    <td class="text-end pe-4">৳{{ "{:,.2f}".format(total_active) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -570,7 +675,7 @@
       </div>
       <div class="col-lg-7">
         <div class="card">
-          <div class="card-header">Advance History (Given + Returned)</div>
+          <div class="card-header">Advance History</div>
           <div class="card-body p-0">
             <div class="table-responsive">
               <table class="table mb-0">
@@ -580,7 +685,7 @@
                     <tr>
                       <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b') }}</td>
                       <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
-                      <td><span class="badge bg-warning text-dark">ADV GIVE</span></td>
+                      <td><span class="badge bg-warning text-dark">ADV</span></td>
                       <td class="fw-bold">{{ t.advance_person }}</td>
                       <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
                     </tr>
@@ -589,7 +694,7 @@
                     <tr>
                       <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b') }}</td>
                       <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
-                      <td><span class="badge bg-info text-dark">ADV RETURN</span></td>
+                      <td><span class="badge bg-info text-dark">RET</span></td>
                       <td class="fw-bold">{{ t.advance_person }}</td>
                       <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
                     </tr>
@@ -676,12 +781,12 @@
     </div>
     <div class="d-flex flex-wrap gap-2 mb-3">
       <a href="/statement" class="nav-link-custom {{ 'active' if not request.args.get('type') }}">All</a>
-      <a href="/statement?type=income" class="nav-link-custom text-success">Inc</a>
-      <a href="/statement?type=expense" class="nav-link-custom text-danger">Exp</a>
-      <a href="/statement?type=bank_in" class="nav-link-custom text-primary">Dep</a>
+      <a href="/statement?type=income" class="nav-link-custom text-success">INC</a>
+      <a href="/statement?type=expense" class="nav-link-custom text-danger">EXP</a>
+      <a href="/statement?type=bank_in" class="nav-link-custom text-primary">DEP</a>
       <a href="/statement?type=withdrawal" class="nav-link-custom text-secondary">W/D</a>
-      <a href="/statement?type=advance" class="nav-link-custom text-warning">Adv Give</a>
-      <a href="/statement?type=advance_return" class="nav-link-custom" style="color:#0ea5e9;">Adv Return</a>
+      <a href="/statement?type=advance" class="nav-link-custom text-warning">ADV</a>
+      <a href="/statement?type=advance_return" class="nav-link-custom" style="color:#0ea5e9;">RET</a>
       <a href="/export_csv" class="btn btn-sm btn-dark rounded-pill px-3 ms-auto">CSV</a>
     </div>
     <div class="card p-0 overflow-hidden">
@@ -721,9 +826,9 @@
                 {% elif t.type=='withdrawal' %}
                   <span class="badge bg-secondary rounded-1">W/D</span>
                 {% elif t.type=='advance' %}
-                  <span class="badge bg-warning text-dark rounded-1">ADV GIVE</span>
+                  <span class="badge bg-warning text-dark rounded-1">ADV</span>
                 {% elif t.type=='advance_return' %}
-                  <span class="badge bg-info text-dark rounded-1">ADV RETURN</span>
+                  <span class="badge bg-info text-dark rounded-1">RET</span>
                 {% else %}
                   <span class="badge bg-dark rounded-1">{{ t.type }}</span>
                 {% endif %}
