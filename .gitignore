@@ -1,1 +1,10 @@
-
+.env
+__pycache__/
+*.pyc
+instance/
+static/uploads/*
+!static/uploads/.gitkeep
+*.sqlite3
+.env.*
+.vscode/
+.idea/
