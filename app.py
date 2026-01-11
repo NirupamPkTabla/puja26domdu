@@ -1,4 +1,5 @@
 import os, secrets, imghdr, csv, io, sys, telepot
+from typing import Optional
 from datetime import datetime
 from flask import (
     Flask, render_template_string, request, redirect, url_for,
@@ -201,7 +202,7 @@ def validate_image_stream(file_storage) -> bool:
             pass
         return False
 
-def save_receipt_image(file_storage) -> str | None:
+def save_receipt_image(file_storage) -> Optional[str]:
     if not file_storage or not getattr(file_storage, 'filename', ''):
         return None
     filename = secure_filename(file_storage.filename)
