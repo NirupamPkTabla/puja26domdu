@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Dept. Puja Fund</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏵️</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function initTheme() {
+      const saved = localStorage.getItem('puja_theme');
+      const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const theme = saved || system;
+      document.documentElement.setAttribute('data-bs-theme', theme);
+      const toggleBtn = document.getElementById('themeToggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      }
+    })();
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-bs-theme');
+      const newTheme = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-bs-theme', newTheme);
+      localStorage.setItem('puja_theme', newTheme);
+      document.getElementById('themeToggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+  </script>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --border: rgba(0,0,0,0.05);
+      --text: #111827;
+      --text-muted: #6b7280;
+      --input-bg: #f1f5f9;
+    }
+    [data-bs-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --border: rgba(255,255,255,0.05);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --input-bg: #334155;
+    }
+    body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); }
+    .navbar { background: var(--card-bg) !important; border-bottom: 1px solid var(--border); padding: 0.8rem 1.5rem; }
+    .nav-link-custom {
+      color: var(--text-muted); font-weight: 600; text-decoration:none;
+      padding: 0.5rem 1rem; border-radius: 20px; transition: all 0.2s;
+    }
+    .nav-link-custom:hover, .nav-link-custom.active {
+      color: var(--primary); background: rgba(79, 70, 229, 0.1); font-weight: 700;
+    }
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); overflow: hidden;
+    }
+    .card-header {
+      background: transparent; border-bottom: 1px solid var(--border);
+      font-weight: 700; padding: 1.25rem 1.5rem; color: var(--text); font-size: 1.1rem;
+    }
+    .form-control, .form-select, .input-group-text {
+      background-color: var(--input-bg);
+      border: 1px solid transparent;
+      color: var(--text);
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    .stat-val {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-top: 0.5rem;
+      line-height: 1.1;
+    }
+    @media (max-width: 768px) {
+      .stat-val { font-size: 1.9rem; }
+    }
+    .form-control:focus, .form-select:focus {
+      background-color: var(--card-bg); border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+    .btn-action {
+      background: var(--primary); border: none; color: white;
+      padding: 0.9rem; border-radius: 12px; font-weight: 800; width: 100%; letter-spacing: 0.4px;
+    }
+    .table { --bs-table-bg: transparent; --bs-table-color: var(--text); --bs-table-border-color: var(--border); }
+    .table th {
+      font-weight: 800; font-size: 0.78rem; text-transform: uppercase;
+      color: var(--text-muted); border-bottom-width: 1px; padding: 1rem; letter-spacing: 0.5px;
+    }
+    .table td { vertical-align: middle; padding: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02); }
+    [data-bs-theme="dark"] .table-hover tbody tr:hover { background-color: rgba(255,255,255,0.02); }
+    #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+    .toast-msg {
+      background: var(--card-bg); padding: 1rem 1.25rem; border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-top: 10px;
+      border-left: 5px solid; display:flex; gap:1rem; align-items:center;
+      min-width: 300px; justify-content: space-between; color: var(--text); font-weight: 600;
+    }
+    [data-bs-theme="dark"] .text-muted { color: rgba(248,250,252,0.65) !important; }
+    .trx-id { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .copy-btn {
+      border: 0; background: transparent; color: var(--text-muted);
+      padding: 4px 8px; border-radius: 8px; font-size: 0.9rem;
+    }
+    .copy-btn:hover { background: rgba(79,70,229,0.12); color: var(--primary); }
+    .btn-sm { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+    .small-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .fab {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 50%;
+      background-color: var(--primary);
+      color: white;
+      font-size: 1.8rem;
+      font-weight: bold;
+      border: none;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
+      z-index: 1050;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fab:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s;
+    }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container-fluid px-lg-4">
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <div style="font-size: 1.5rem; margin-right: 0.5rem;">🏵️</div>
+      <div class="d-flex flex-column" style="line-height: 1.2;">
+        <span class="fw-bold fs-5">Saraswati Puja 2026</span>
+        <span class="small text-muted fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Dept. of Music, University of Dhaka</span>
+      </div>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a href="/" class="nav-link-custom {{'active' if page=='dashboard'}}">Home</a></li>
+        {% if current_user.role != 'viewer' %}
+          <li class="nav-item"><a href="/income" class="nav-link-custom {{'active' if page=='income'}}">Income</a></li>
+          <li class="nav-item"><a href="/expense" class="nav-link-custom {{'active' if page=='expense'}}">Expense</a></li>
+          <li class="nav-item"><a href="/bank" class="nav-link-custom {{'active' if page=='bank'}}">Bank</a></li>
+          <li class="nav-item"><a href="/active_advances" class="nav-link-custom {{'active' if page=='active_advances'}}">Advance</a></li>
+          <li class="nav-item"><a href="/statement" class="nav-link-custom {{'active' if page=='statement'}}">Statement</a></li>
+        {% endif %}
+        <li class="nav-item"><a href="/charts" class="nav-link-custom {{'active' if page=='charts'}}">Charts</a></li>
+        {% if current_user.role == 'admin' %}
+          <li class="nav-item"><a href="/log" class="nav-link-custom {{'active' if page=='log'}}">Log</a></li>
+          <li class="nav-item"><a href="/admin" class="nav-link-custom {{'active' if page=='admin'}}">Admin</a></li>
+        {% endif %}
+        <li class="nav-item ms-3">
+          <button id="themeToggle" onclick="toggleTheme()" class="btn btn-sm btn-outline-secondary rounded-pill px-3">🌙</button>
+        </li>
+        <li class="nav-item ms-3">
+          <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger rounded-pill px-4">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div id="toast-container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="toast-msg border-{{category}}">
+          <span>{{ message }}</span>
+          <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+</div>
+<div class="container mt-4 mb-5 px-lg-4">
+  {% if page == 'dashboard' %}
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-3">
+        <div class="card p-4 text-center h-100">
+          <div class="small-label">Cash In Hand</div>
+          <div class="stat-val text-success">৳{{ "{:,.2f}".format(cash) }}</div>
+          <div class="small text-muted mt-2">Total Income: ৳{{ "{:,.2f}".format(income) }}</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card p-4 text-center h-100">
+          <div class="small-label">Bank Balance</div>
+          <div class="stat-val text-primary">৳{{ "{:,.2f}".format(bank) }}</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card p-4 text-center h-100">
+          <div class="small-label">Active Advances</div>
+          <div class="stat-val text-warning">৳{{ "{:,.2f}".format(advances_total) }}</div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="card p-4 text-center h-100">
+          <div class="small-label">Total Expenses</div>
+          <div class="stat-val text-danger">৳{{ "{:,.2f}".format(expense) }}</div>
+        </div>
+      </div>
+    </div>
+    {% if current_user.role == 'viewer' %}
+      <div class="text-center mt-5">
+        <h4 class="fw-bold text-primary">Read-only Viewer Mode</h4>
+        <p class="text-muted lead">You can view the summary above and the Charts page.</p>
+      </div>
+    {% else %}
+      <button type="button" class="fab" data-bs-toggle="modal" data-bs-target="#newTxModal">NEW</button>
+      <div class="modal fade" id="newTxModal" tabindex="-1" aria-labelledby="newTxLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="newTxLabel">New Transaction</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="/add" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="mb-2">
+                  <label class="small-label mb-1">TYPE</label>
+                  <select name="type" class="form-select" id="typeSelector" onchange="updateFormUI()">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                    <option value="bank_in">Bank In</option>
+                    <option value="withdrawal">Bank Out</option>
+                    <option value="advance">Give Advance</option>
+                    <option value="settle_advance">Settle Advance</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                  <label class="small-label mb-1">DATE</label>
+                  <input type="date" name="transaction_date" id="txDate" class="form-control" required>
+                </div>
+                <div id="standard-fields">
+                  <div id="category-group" class="mb-2" style="display:none;">
+                    <label class="small-label mb-1">CATEGORY</label>
+                    <select name="category" id="catDropdown" class="form-select"></select>
+                  </div>
+                  <div id="account-group" class="mb-2" style="display:none;">
+                    <label class="small-label mb-1">BANK DETAILS</label>
+                    <div id="bank-in-fields">
+                      <input type="text" name="acc_sender" class="form-control mb-1" placeholder="Sender Account">
+                      <input type="text" name="acc_receiver" class="form-control" placeholder="Receiver Account">
+                    </div>
+                    <div id="withdrawal-fields" style="display:none;">
+                      <input type="text" name="withdrawn_by" class="form-control mb-1" placeholder="Who withdrew it?">
+                      <div class="input-group">
+                        <span class="input-group-text">Fee %</span>
+                        <select name="fee_percentage" id="feePct" class="form-select" onchange="calcFee()">
+                          <option value="0">0%</option>
+                          {% for f in fees %}
+                            <option value="{{ f.amount }}">{{ f.amount }}%</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <small id="fee-calc-display" class="text-danger fw-bold d-block mt-1"></small>
+                    </div>
+                  </div>
+                  <div id="advance-group" class="mb-2" style="display:none;">
+                    <label class="small-label mb-1">PERSON</label>
+                    <input type="text" name="advance_person" class="form-control" placeholder="Name">
+                  </div>
+                  <div class="mb-2">
+                    <label class="small-label mb-1">AMOUNT</label>
+                    <div class="input-group">
+                      <span class="input-group-text">৳</span>
+                      <input type="number" step="0.01" name="amount" id="mainAmount"
+                             class="form-control fw-bold" placeholder="0.00" oninput="calcFee()" required>
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <label class="small-label mb-1">DESCRIPTION / NOTE</label>
+                    <input type="text" name="description" class="form-control" placeholder="Optional">
+                  </div>
+                  <div class="mb-3">
+                    <label class="small-label mb-1">RECEIPT IMAGE (optional)</label>
+                    <input type="file" name="receipt" class="form-control" accept="image/*">
+                  </div>
+                </div>
+                <div id="settle-fields" style="display:none; background: var(--bg); padding: 1rem; border-radius: 12px;">
+                  <div class="mb-2">
+                    <label class="fw-bold mb-1">Active Advance</label>
+                    <select name="advance_id" id="advDropdown" class="form-select" onchange="calcSettlement()">
+                      <option value="" data-amt="0">Select Person...</option>
+                      {% for adv in pending_advances %}
+                        <option value="{{ adv.id }}" data-amt="{{ adv.amount }}">{{ adv.advance_person }} (৳{{ adv.amount }})</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <label class="small-label mb-1">EXPENSES (optional)</label>
+                  <div class="small text-muted mb-2">If returning full amount without spending, leave empty.</div>
+                  <div id="spend-rows"></div>
+                  <button type="button" class="btn btn-sm btn-outline-secondary mb-3 w-100" style="border-style:dashed" onclick="addSpendRow()">+ Add Item</button>
+                  <div class="mb-2">
+                    <label class="small-label mb-1">REMAINING BALANCE</label>
+                    <div class="btn-group w-100" role="group">
+                      <input type="radio" class="btn-check" name="settle_type" id="settleReturn" value="return" checked>
+                      <label class="btn btn-outline-success py-2" for="settleReturn">Return to Box</label>
+                      <input type="radio" class="btn-check" name="settle_type" id="settleCarry" value="carry">
+                      <label class="btn btn-outline-warning py-2" for="settleCarry">New Advance</label>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between small fw-bold text-muted border-top pt-2">
+                    <span>Original: ৳<span id="disp-adv">0</span></span>
+                    <span>Spent: ৳<span id="disp-spent">0</span></span>
+                  </div>
+                  <div class="text-center mt-2 fw-bold fs-4 text-primary">Balance: ৳<span id="disp-return">0</span></div>
+                </div>
+                <button class="btn-action mt-3">Save Record</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        const incomeCats = [{% for c in inc_cats %}"{{ c.name }}",{% endfor %}];
+        const expenseCats = [{% for c in exp_cats %}"{{ c.name }}",{% endfor %}];
+        function buildCategoryDropdown(selectEl, items){
+          selectEl.innerHTML = '';
+          const ph = document.createElement('option');
+          ph.value = '';
+          ph.disabled = true;
+          ph.selected = true;
+          ph.innerText = 'Select a category...';
+          selectEl.appendChild(ph);
+          items.forEach(c => {
+            let opt = document.createElement('option');
+            opt.value = c;
+            opt.innerHTML = c;
+            selectEl.appendChild(opt);
+          });
+        }
+        function updateFormUI() {
+          const type = document.getElementById('typeSelector').value;
+          const standardFields = document.getElementById('standard-fields');
+          const settleFields = document.getElementById('settle-fields');
+          const catGroup = document.getElementById('category-group');
+          const catDropdown = document.getElementById('catDropdown');
+          const accGroup = document.getElementById('account-group');
+          const advGroup = document.getElementById('advance-group');
+          const bankInFields = document.getElementById('bank-in-fields');
+          const withdrawFields = document.getElementById('withdrawal-fields');
+          const mainAmount = document.getElementById('mainAmount');
+          const txDateInput = document.getElementById('txDate');
+
+          catDropdown.required = false;
+          catDropdown.disabled = true;
+
+          if (type === 'settle_advance') {
+            standardFields.style.display = 'none';
+            settleFields.style.display = 'block';
+            mainAmount.removeAttribute('required');
+          } else {
+            mainAmount.setAttribute('required', '');
+            standardFields.style.display = 'block';
+            settleFields.style.display = 'none';
+            catGroup.style.display = 'none';
+            accGroup.style.display = 'none';
+            advGroup.style.display = 'none';
+            catDropdown.innerHTML = '';
+            if (type === 'income') {
+              catGroup.style.display = 'block';
+              catDropdown.disabled = false;
+              catDropdown.required = true;
+              buildCategoryDropdown(catDropdown, incomeCats);
+            } else if (type === 'expense') {
+              catGroup.style.display = 'block';
+              catDropdown.disabled = false;
+              catDropdown.required = true;
+              buildCategoryDropdown(catDropdown, expenseCats);
+            } else if (type === 'bank_in') {
+              accGroup.style.display = 'block';
+              bankInFields.style.display = 'block';
+              withdrawFields.style.display = 'none';
+            } else if (type === 'withdrawal') {
+              accGroup.style.display = 'block';
+              bankInFields.style.display = 'none';
+              withdrawFields.style.display = 'block';
+            } else if (type === 'advance') {
+              advGroup.style.display = 'block';
+            }
+          }
+
+          const today = new Date().toISOString().split('T')[0];
+          txDateInput.value = today;
+          txDateInput.max = today;
+          txDateInput.disabled = false;
+          txDateInput.setAttribute('required', '');
+        }
+        function addSpendRow() {
+          const div = document.createElement('div'); div.className = 'row g-2 mb-2 spend-row';
+          let catSelect = `<select name="spend_category[]" class="form-select form-select-sm">`;
+          expenseCats.forEach(c => { catSelect += `<option value="${c}">${c}</option>`; });
+          catSelect += `</select>`;
+          div.innerHTML = `<div class="col-4">${catSelect}</div>
+                           <div class="col-3"><input type="number" name="spend_amount[]" class="form-control form-control-sm" placeholder="Amt" step="0.01" oninput="calcSettlement()"></div>
+                           <div class="col-3"><input type="text" name="spend_desc[]" class="form-control form-control-sm" placeholder="Desc"></div>
+                           <div class="col-2"><input type="file" name="spend_receipt[]" class="form-control form-control-sm" accept="image/*"></div>
+                           <div class="col-1"><button type="button" class="btn btn-sm btn-light text-danger w-100" onclick="this.parentElement.parentElement.remove(); calcSettlement()">×</button></div>`;
+          document.getElementById('spend-rows').appendChild(div);
+        }
+        function calcSettlement() {
+          const advSelect = document.getElementById('advDropdown');
+          const totalAdv = parseFloat(advSelect.options[advSelect.selectedIndex].getAttribute('data-amt')) || 0;
+          const inputs = document.getElementsByName('spend_amount[]');
+          let totalSpent = 0; inputs.forEach(inp => { totalSpent += parseFloat(inp.value) || 0; });
+          document.getElementById('disp-adv').innerText = totalAdv.toFixed(2);
+          document.getElementById('disp-spent').innerText = totalSpent.toFixed(2);
+          document.getElementById('disp-return').innerText = (totalAdv - totalSpent).toFixed(2);
+        }
+        function calcFee() {
+          const amt = parseFloat(document.getElementById('mainAmount').value) || 0;
+          const feePct = document.getElementById('feePct');
+          if(!feePct) return;
+          const pct = parseFloat(feePct.value) || 0;
+          const fee = amt * (pct / 100);
+          const el = document.getElementById('fee-calc-display');
+          if(el) el.innerText = fee > 0 ? `Fees: ৳${fee.toFixed(2)}` : '';
+        }
+        const newTxModal = document.getElementById('newTxModal');
+        if (newTxModal) {
+          newTxModal.addEventListener('shown.bs.modal', () => {
+            updateFormUI();
+            document.getElementById('spend-rows').innerHTML = '';
+            addSpendRow();
+            calcSettlement();
+            document.getElementById('mainAmount').focus();
+          });
+        }
+      </script>
+    {% endif %}
+  {% endif %}
+
+  {% if page == 'income' %}
+    <div class="card">
+      <div class="card-header text-success">Income Breakdown</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead><tr><th class="ps-4">Category</th><th class="text-end pe-4">Amount</th></tr></thead>
+            <tbody>
+              {% for cat, amt in inc_breakdown.items() %}
+                <tr><td class="ps-4">{{ cat }}</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(amt) }}</td></tr>
+              {% endfor %}
+              <tr class="bg-light fw-bold">
+                <td class="ps-4">TOTAL INCOME</td>
+                <td class="text-end pe-4 text-success">৳{{ "{:,.2f}".format(total_inc) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'expense' %}
+    <div class="card">
+      <div class="card-header text-danger">Expense Breakdown</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead><tr><th class="ps-4">Category</th><th class="text-end pe-4">Amount</th></tr></thead>
+            <tbody>
+              {% for cat, amt in exp_breakdown.items() %}
+                <tr><td class="ps-4">{{ cat }}</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(amt) }}</td></tr>
+              {% endfor %}
+              <tr class="text-danger small"><td class="ps-4">+ Bank Withdrawal Fees</td><td class="text-end pe-4">৳{{ "{:,.2f}".format(total_fees) }}</td></tr>
+              <tr class="bg-light fw-bold">
+                <td class="ps-4">TOTAL EXPENSE</td>
+                <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(total_exp) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'bank' %}
+    <div class="card">
+      <div class="card-header">Bank Transactions</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th class="ps-4">Date</th>
+                <th class="ps-4">Trx ID</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th class="text-end">Amount</th>
+                <th class="text-end pe-4">Fee</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in bank_ins %}
+              <tr>
+                <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b %Y') }}</td>
+                <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
+                <td><span class="badge bg-primary">DEPOSIT</span></td>
+                <td>From: {{ t.acc_sender }} → To: {{ t.acc_receiver }}</td>
+                <td class="text-end text-success">+৳{{ "{:,.2f}".format(t.amount) }}</td>
+                <td class="text-end pe-4">-</td>
+              </tr>
+              {% endfor %}
+              {% for t in withdrawals %}
+              <tr>
+                <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b %Y') }}</td>
+                <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
+                <td><span class="badge bg-secondary">WITHDRAWAL</span></td>
+                <td>Withdrawn by: {{ t.withdrawn_by }}</td>
+                <td class="text-end text-danger">-৳{{ "{:,.2f}".format(t.amount) }}</td>
+                <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(t.fee or 0) }}</td>
+              </tr>
+              {% endfor %}
+              <tr class="bg-light fw-bold">
+                <td colspan="5" class="text-end">TOTAL FEES OWED</td>
+                <td class="text-end pe-4 text-danger">৳{{ "{:,.2f}".format(total_fees) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'active_advances' %}
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="card">
+          <div class="card-header">Active Advances</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead><tr><th class="ps-4">Date</th><th class="ps-4">Trx ID</th><th>Person</th><th class="text-end pe-4">Amount</th></tr></thead>
+                <tbody>
+                  {% for t in active_advances %}
+                    <tr>
+                      <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b') }}</td>
+                      <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
+                      <td class="fw-bold">{{ t.advance_person }}</td>
+                      <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
+                    </tr>
+                  {% endfor %}
+                  <tr class="bg-light fw-bold">
+                    <td colspan="3" class="ps-4 text-end">TOTAL OUTSTANDING</td>
+                    <td class="text-end pe-4 text-warning">৳{{ "{:,.2f}".format(total_active) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header">Advance History (Given + Returned)</div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead><tr><th class="ps-4">Date</th><th class="ps-4">Trx ID</th><th>Type</th><th>Person</th><th class="text-end pe-4">Amount</th></tr></thead>
+                <tbody>
+                  {% for t in advances_all %}
+                    <tr>
+                      <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b') }}</td>
+                      <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
+                      <td><span class="badge bg-warning text-dark">ADV GIVE</span></td>
+                      <td class="fw-bold">{{ t.advance_person }}</td>
+                      <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
+                    </tr>
+                  {% endfor %}
+                  {% for t in returns_all %}
+                    <tr>
+                      <td class="ps-4 text-muted small">{{ t.date.strftime('%d %b') }}</td>
+                      <td class="ps-4"><span class="trx-id">{{ t.trx_id }}</span></td>
+                      <td><span class="badge bg-info text-dark">ADV RETURN</span></td>
+                      <td class="fw-bold">{{ t.advance_person }}</td>
+                      <td class="text-end pe-4">৳{{ "{:,.2f}".format(t.amount) }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'charts' %}
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header text-center">Fund Allocation</div>
+          <div class="card-body">
+            <div style="height: 400px;"><canvas id="allocationChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="card h-100">
+          <div class="card-header text-danger text-center">Expense by Category</div>
+          <div class="card-body">
+            <div style="height: 400px;"><canvas id="expenseChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header text-success text-center">Income by Category</div>
+          <div class="card-body">
+            <div style="height: 400px;"><canvas id="incomeChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      Chart.defaults.font.family = "system-ui";
+      const ctxAlloc = document.getElementById('allocationChart').getContext('2d');
+      new Chart(ctxAlloc, {
+        type: 'doughnut',
+        data: {
+          labels: {{ chart_allocation.labels | tojson }},
+          datasets: [{ data: {{ chart_allocation.data | tojson }}, backgroundColor: ['#10b981', '#4f46e5', '#f59e0b', '#ef4444'], borderWidth: 0 }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } }, layout: { padding: 20 } }
+      });
+      const ctxExp = document.getElementById('expenseChart').getContext('2d');
+      new Chart(ctxExp, {
+        type: 'bar',
+        data: {
+          labels: {{ exp_labels | tojson }},
+          datasets: [{ label: 'Expense', data: {{ exp_values | tojson }}, backgroundColor: '#ef4444', borderRadius: 6 }]
+        },
+        options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+      });
+      const ctxInc = document.getElementById('incomeChart').getContext('2d');
+      new Chart(ctxInc, {
+        type: 'bar',
+        data: {
+          labels: {{ inc_labels | tojson }},
+          datasets: [{ label: 'Income', data: {{ inc_values | tojson }}, backgroundColor: '#10b981', borderRadius: 6 }]
+        },
+        options: { scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+      });
+    </script>
+  {% endif %}
+
+  {% if page == 'statement' %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold m-0">Statement</h4>
+      <form class="d-flex gap-2" method="GET" action="/statement">
+        {% if filter_type %}
+          <input type="hidden" name="type" value="{{ filter_type }}">
+        {% endif %}
+        <input class="form-control" name="q" value="{{ q or '' }}" placeholder="Search Trx ID">
+        <button class="btn btn-dark rounded-pill px-3" type="submit">Search</button>
+        <a href="/statement{% if filter_type %}?type={{filter_type}}{% endif %}" class="btn btn-outline-secondary rounded-pill px-3">Clear</a>
+      </form>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <a href="/statement" class="nav-link-custom {{ 'active' if not request.args.get('type') }}">All</a>
+      <a href="/statement?type=income" class="nav-link-custom text-success">Inc</a>
+      <a href="/statement?type=expense" class="nav-link-custom text-danger">Exp</a>
+      <a href="/statement?type=bank_in" class="nav-link-custom text-primary">Dep</a>
+      <a href="/statement?type=withdrawal" class="nav-link-custom text-secondary">W/D</a>
+      <a href="/statement?type=advance" class="nav-link-custom text-warning">Adv Give</a>
+      <a href="/statement?type=advance_return" class="nav-link-custom" style="color:#0ea5e9;">Adv Return</a>
+      <a href="/export_csv" class="btn btn-sm btn-dark rounded-pill px-3 ms-auto">CSV</a>
+    </div>
+    <div class="card p-0 overflow-hidden">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4">Trx ID</th>
+              <th>Date</th>
+              <th>By</th>
+              <th>Type</th>
+              <th>Details</th>
+              <th class="text-end">Amount</th>
+              <th class="text-center">Receipt</th>
+              <th class="text-center">Status</th>
+              <th class="text-end pe-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in transactions %}
+            <tr>
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="trx-id">{{ t.trx_id }}</span>
+                  <button class="copy-btn" type="button" title="Copy Trx ID" onclick="copyText('{{ t.trx_id }}')">📋</button>
+                </div>
+              </td>
+              <td class="small text-muted">{{ t.date.strftime('%d %b') }}</td>
+              <td class="fw-bold">{{ t.created_by or '-' }}</td>
+              <td>
+                {% if t.type=='income' %}
+                  <span class="badge bg-success rounded-1">INC</span>
+                {% elif t.type=='expense' %}
+                  <span class="badge bg-danger rounded-1">EXP</span>
+                {% elif t.type=='bank_in' %}
+                  <span class="badge bg-primary rounded-1">DEP</span>
+                {% elif t.type=='withdrawal' %}
+                  <span class="badge bg-secondary rounded-1">W/D</span>
+                {% elif t.type=='advance' %}
+                  <span class="badge bg-warning text-dark rounded-1">ADV GIVE</span>
+                {% elif t.type=='advance_return' %}
+                  <span class="badge bg-info text-dark rounded-1">ADV RETURN</span>
+                {% else %}
+                  <span class="badge bg-dark rounded-1">{{ t.type }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="fw-bold text-truncate" style="max-width:220px;">
+                  {% if t.category %}{{ t.category }}
+                  {% elif t.type == 'advance' %}Advance: {{ t.advance_person }}
+                  {% elif t.type == 'advance_return' %}Return: {{ t.advance_person }}
+                  {% elif t.withdrawn_by %}By: {{ t.withdrawn_by }}
+                  {% elif t.acc_sender %}From: {{ t.acc_sender }}
+                  {% endif %}
+                </div>
+                {% if t.description %}
+                  <div class="small text-muted text-truncate" style="max-width:220px;">{{ t.description }}</div>
+                {% endif %}
+              </td>
+              <td class="text-end">৳{{ "{:,.2f}".format(t.amount) }}</td>
+              <td class="text-center">
+                {% if t.receipt_image %}
+                  <a href="{{ url_for('uploaded_file', filename=t.receipt_image) }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if t.type == 'advance' %}
+                  {% if t.is_settled %}✔{% else %}⏳{% endif %}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td class="text-end pe-4">
+                {% if current_user.role == 'admin' %}
+                  <form id="delForm{{ t.id }}" action="/delete/{{ t.id }}" method="POST" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <input type="hidden" name="admin_password" value="">
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill"
+                            onclick="requestAdminPasswordAndSubmit('delForm{{ t.id }}')">Delete</button>
+                  </form>
+                {% else %}
+                  <span class="text-muted small">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-center py-3">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('statement', page=pagination.prev_num, type=filter_type, q=q) }}" class="btn btn-sm btn-outline-secondary me-2">Previous</a>
+        {% endif %}
+        <span class="align-self-center small text-muted">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+        {% if pagination.has_next %}
+          <a href="{{ url_for('statement', page=pagination.next_num, type=filter_type, q=q) }}" class="btn btn-sm btn-outline-secondary ms-2">Next</a>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'log' %}
+    <div class="card">
+      <div class="card-header">Activity Log</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th class="ps-4">Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th class="pe-4">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td class="ps-4 small text-muted">{{ log.timestamp.strftime('%d %b %Y %H:%M') }}</td>
+                <td class="fw-bold">{{ log.user }}</td>
+                <td>{{ log.action }}</td>
+                <td class="pe-4">{{ log.details }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-center py-3">
+          {% if pagination.has_prev %}
+            <a href="{{ url_for('log_page', page=pagination.prev_num) }}" class="btn btn-sm btn-outline-secondary me-2">Previous</a>
+          {% endif %}
+          <span class="align-self-center small text-muted">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+          {% if pagination.has_next %}
+            <a href="{{ url_for('log_page', page=pagination.next_num) }}" class="btn btn-sm btn-outline-secondary ms-2">Next</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if page == 'admin' %}
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="card">
+          <div class="card-header">Users</div>
+          <div class="card-body">
+            <form method="POST" action="/admin/user" class="mb-4">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="action" value="add">
+              <div class="mb-2"><input class="form-control" name="username" placeholder="New username" required></div>
+              <div class="mb-2"><input class="form-control" type="password" name="password" placeholder="Temp password" required></div>
+              <div class="mb-3">
+                <select name="role" class="form-select">
+                  <option value="viewer">Viewer (read-only)</option>
+                  <option value="user" selected>User (full access)</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <button class="btn btn-primary w-100">Add User</button>
+            </form>
+            <div class="table-responsive">
+              <table class="table mb-0">
+                <thead><tr><th>User</th><th>Role</th><th class="text-end">Actions</th></tr></thead>
+                <tbody>
+                  {% for u in users %}
+                  <tr>
+                    <td class="fw-bold">{{ u.username }}</td>
+                    <td>{{ u.role.capitalize() }}</td>
+                    <td class="text-end">
+                      {% if u.id != current_user.id %}
+                        <form method="POST" action="/admin/user" class="d-inline">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                          <input type="hidden" name="action" value="change_role">
+                          <input type="hidden" name="id" value="{{ u.id }}">
+                          <select name="new_role" class="form-select form-select-sm d-inline w-auto">
+                            <option value="viewer" {% if u.role == 'viewer' %}selected{% endif %}>Viewer</option>
+                            <option value="user" {% if u.role == 'user' %}selected{% endif %}>User</option>
+                            <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                          </select>
+                          <button class="btn btn-sm btn-outline-secondary">Update</button>
+                        </form>
+                        <form method="POST" action="/admin/user" class="d-inline">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                          <input type="hidden" name="action" value="delete">
+                          <input type="hidden" name="id" value="{{ u.id }}">
+                          <button class="btn btn-sm btn-outline-danger">Delete</button>
+                        </form>
+                      {% else %}
+                        <span class="text-muted small">You ({{ u.role.capitalize() }})</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="3">
+                      <form method="POST" action="/admin/user" class="row g-2 align-items-center">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="action" value="change_pass">
+                        <input type="hidden" name="id" value="{{ u.id }}">
+                        <div class="col-8"><input class="form-control form-control-sm" type="password" name="new_password" placeholder="New password"></div>
+                        <div class="col-4 d-grid"><button class="btn btn-sm btn-outline-primary">Set</button></div>
+                      </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">Categories</div>
+              <div class="card-body">
+                <form method="POST" action="/admin/category" class="mb-3">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <input type="hidden" name="action" value="add">
+                  <div class="mb-2"><input class="form-control" name="name" placeholder="Category name" required></div>
+                  <div class="mb-2">
+                    <select class="form-select" name="type" required>
+                      <option value="income">Income</option>
+                      <option value="expense">Expense</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary w-100">Add Category</button>
+                </form>
+                <div class="table-responsive">
+                  <table class="table mb-0">
+                    <thead><tr><th>Name</th><th>Type</th><th class="text-end">Actions</th></tr></thead>
+                    <tbody>
+                      {% for c in cats %}
+                      <tr>
+                        <td class="fw-bold">{{ c.name }}</td>
+                        <td>{{ c.type }}</td>
+                        <td class="text-end">
+                          <button class="btn btn-sm btn-outline-primary" onclick="editCategory({{ c.id }}, '{{ c.name|e }}')">Edit</button>
+                          <form method="POST" action="/admin/category" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="{{ c.id }}">
+                            <button class="btn btn-sm btn-outline-danger">×</button>
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">Withdrawal Fee %</div>
+              <div class="card-body">
+                <form method="POST" action="/admin/fee" class="mb-3">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                  <input type="hidden" name="action" value="add">
+                  <div class="mb-2"><input class="form-control" name="amount" type="number" step="0.01" placeholder="e.g., 1.5" required></div>
+                  <button class="btn btn-primary w-100">Add Fee %</button>
+                </form>
+                <div class="table-responsive">
+                  <table class="table mb-0">
+                    <thead><tr><th>Percent</th><th class="text-end">Delete</th></tr></thead>
+                    <tbody>
+                      {% for f in fees %}
+                      <tr>
+                        <td class="fw-bold">{{ f.amount }}%</td>
+                        <td class="text-end">
+                          <form method="POST" action="/admin/fee" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="{{ f.id }}">
+                            <button class="btn btn-sm btn-outline-danger">×</button>
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="editCategoryModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="POST" action="/admin/category">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="id" id="editCatId">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Category</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <input class="form-control" name="new_name" id="editCatName" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      function editCategory(id, name) {
+        document.getElementById('editCatId').value = id;
+        document.getElementById('editCatName').value = name;
+        new bootstrap.Modal(document.getElementById('editCategoryModal')).show();
+      }
+    </script>
+  {% endif %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => document.querySelectorAll('.toast-msg').forEach(x => x.remove()), 5000);
+  });
+  function copyText(txt){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+  }
+  let pendingFormId = null;
+  function requestAdminPasswordAndSubmit(formId){
+    pendingFormId = formId;
+    const input = document.getElementById('adminAuthInput');
+    input.value = '';
+    const modal = new bootstrap.Modal(document.getElementById('adminAuthModal'));
+    modal.show();
+    setTimeout(() => input.focus(), 150);
+  }
+  function confirmAdminAuth(){
+    const pw = document.getElementById('adminAuthInput').value || '';
+    if(!pendingFormId) return;
+    const form = document.getElementById(pendingFormId);
+    if(!form) return;
+    const pwField = form.querySelector('input[name="admin_password"]');
+    if(pwField) pwField.value = pw;
+    form.submit();
+  }
+</script>
+<div class="modal fade" id="adminAuthModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Admin Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="password" id="adminAuthInput" class="form-control" placeholder="Enter password">
+        <div class="small text-muted mt-2">Required to confirm this action.</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="confirmAdminAuth()">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
