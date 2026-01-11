@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bani Aarchana: DOM, DU | Login</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏵️</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script>
+    (function initTheme() {
+      const saved = localStorage.getItem('puja_theme');
+      const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      const theme = saved || system;
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
+  <style>
+    :root { --primary: #4f46e5; --bg-body: #f8fafc; --text-main: #0f172a; --card-bg: #ffffff; --input-bg: #f1f5f9; --border-color: #e2e8f0; }
+    [data-bs-theme="dark"] { --primary: #6366f1; --bg-body: #0f172a; --text-main: #f8fafc; --card-bg: #1e293b; --input-bg: #334155; --border-color: #334155; }
+    [data-bs-theme="dark"] .text-muted { color: rgba(248,250,252,0.65) !important; }
+    body { background-color: var(--bg-body); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); width: 100%; max-width: 420px; padding: 2.5rem; }
+    .form-control { background-color: var(--input-bg); border: 1px solid transparent; color: var(--text-main); padding: 0.8rem; border-radius: 10px; }
+    .form-control:focus { background-color: var(--card-bg); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+    .btn-primary { background-color: var(--primary); border: none; padding: 0.8rem; border-radius: 10px; font-weight: 600; width: 100%; }
+    #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+    .toast-msg { background: var(--card-bg); border-left: 5px solid; padding: 1rem 1.25rem; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-top: 10px; display:flex; gap:1rem; align-items:center; min-width: 300px; justify-content: space-between; color: var(--text-main); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div style="position:fixed; bottom:12px; left:12px; font-size:0.75rem; opacity:0.7;">v{{ app_version }}</div>
+  <div id="toast-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for category, message in messages %}
+      <div class="toast-msg border-{{category}}">
+        <span>{{ message }}</span>
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+      </div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+  </div>
+  <div class="card">
+    <div class="text-center mb-4">
+      <div style="font-size: 3rem;">🏵️</div>
+      <h3 class="fw-bold mt-2 mb-0">Saraswati Puja 2026</h3>
+      <p class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Dept. of Music, University of Dhaka</p>
+    </div>
+    <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="mb-3"><input type="text" name="username" class="form-control" placeholder="Username" required></div>
+      <div class="mb-4"><input type="password" name="password" class="form-control" placeholder="Password" required></div>
+      <button class="btn btn-primary">Sign In</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>setTimeout(function(){document.querySelectorAll('.toast-msg').forEach(x=>x.remove())},5000);</script>
+</body>
+</html>
