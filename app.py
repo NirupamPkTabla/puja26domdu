@@ -23,19 +23,24 @@ def print_log(text=""):
 
 # --- Configuration ---
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'NO_SECRET_KEY_SET')
-if app.config['SECRET_KEY'] == 'NO_SECRET_KEY_SET':
+SECRET_KEY = os.environ.get('SECRET_KEY', 'NO_SECRET_KEY_SET')
+if SECRET_KEY == 'NO_SECRET_KEY_SET':
     print_log("SECRET_KEY NOT SET! EXITING...")
+    sys.exit(1)
+
+DATABASE_URL = (os.environ.get('DATABASE_URL') or '').strip()
+if not DATABASE_URL:
+    print_log("DATABASE_URL NOT SET! EXITING...")
     sys.exit(1)
 
 INITIAL_ADMIN_PASSWORD = os.environ.get('INITIAL_ADMIN_PASSWORD', 'NO_PASSWORD_SET')
 if INITIAL_ADMIN_PASSWORD == 'NO_PASSWORD_SET':
     print_log("INITIAL_ADMIN_PASSWORD NOT SET! EXITING...")
     sys.exit(1)
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+UPLOAD_FOLDER = 'static/uploads'
 try:
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 except Exception:
     print_log(f"CANNOT CREATE UPLOAD FOLDER! EXITING...")
     sys.exit(1)
@@ -44,13 +49,12 @@ MAX_IMAGE_SIZE_MB = int(os.environ.get('MAX_IMAGE_SIZE_MB', '404'))
 if MAX_IMAGE_SIZE_MB == 404:
     print_log("MAX_IMAGE_SIZE_MB NOT SET! USING : 50 MB.")
     MAX_IMAGE_SIZE_MB = 50
-app.config['MAX_CONTENT_LENGTH'] = MAX_IMAGE_SIZE_MB * 1024 * 1024
 
-FLASK_DEBUG = os.environ.get('FLASK_DEBUG', '').strip().lower() in ('1', 'true', 'yes')
 FLASK_HOST = os.environ.get('FLASK_HOST', 'NO_HOST_SET')
 if FLASK_HOST == 'NO_HOST_SET':
     print_log("FLASK_HOST NOT SET! EXITING...")
     sys.exit(1)
+
 FLASK_PORT = int(os.environ.get('FLASK_PORT', 'NO_PORT_SET'))
 if FLASK_PORT == 'NO_PORT_SET':
     print_log("FLASK_PORT NOT SET! EXITING...")
@@ -60,36 +64,52 @@ APP_VERSION = os.environ.get('APP_VERSION', 'STABLE RELEASE')
 if APP_VERSION == 'STABLE RELEASE':
     print_log("APP_VERSION NOT SET! USING : 'STABLE RELEASE'.")
 
+FLASK_DEBUG = os.environ.get('FLASK_DEBUG', '').strip().lower() in ('1', 'true', 'yes')
 ALLOWED_IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp'}
-
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', 'NO_TOKEN_SET')
-if TELEGRAM_BOT_TOKEN == 'NO_TOKEN_SET':
-    TELEGRAM_ENABLED = False
-    print_log("TELEGRAM_BOT_TOKEN NOT SET! DISABLED TELEGRAM NOTIFICATION.")
-else:
-    TELEGRAM_BOT = telepot.Bot(TELEGRAM_BOT_TOKEN)
-    print_log("CREATED TELEGRAM BOT INSTANCE.")
-    TELEGRAM_ENABLED = os.environ.get('TELEGRAM_ENABLED', '').strip().lower() in ('1', 'true', 'yes')
-    if TELEGRAM_ENABLED:
-        print_log("TELEGRAM NOTIFICATIONS ENABLED.")
-    elif not TELEGRAM_ENABLED:
-        print_log("TELEGRAM_NOTIFICATIONS DISABLED IN ENV FILE.")
-
-TELEGRAM_RECIPIENTS = [item.strip() for item in os.environ.get('TELEGRAM_RECIPIENTS', '').split(',') if item.strip()]
-if not TELEGRAM_RECIPIENTS:
-    TELEGRAM_ENABLED = False
-    print_log("TELEGRAM_RECIPIENTS NOT SET! DISABLED TELEGRAM NOTIFICATION.")
-else:
-    print_log(f"TELEGRAM RECIPIENTS: {', '.join(TELEGRAM_RECIPIENTS)}")
-
 RESET_DB = os.environ.get('RESET_DB', '').strip().lower() in ('1', 'true', 'yes')
 RESET_DB_CONFIRM = os.environ.get('RESET_DB_CONFIRM', '').strip().lower() in ('1', 'true', 'yes')
 
-DATABASE_URL = (os.environ.get('DATABASE_URL') or '').strip()
-if not DATABASE_URL:
-    print_log("DATABASE_URL NOT SET! EXITING...")
-    sys.exit(1)
+TELEGRAM_ENABLED = os.environ.get('TELEGRAM_ENABLED', '').strip().lower() in ('1', 'true', 'yes')
+TELEGRAM_ENABLED_ADMIN = os.environ.get('TELEGRAM_ENABLED_ADMIN', '').strip().lower() in ('1', 'true', 'yes')
+if TELEGRAM_ENABLED or TELEGRAM_ENABLED_ADMIN:
+    if TELEGRAM_ENABLED:
+        print_log("TELEGRAM_ENABLED ENV SET TO TRUE.")
+    else:
+        print_log("TELEGRAM_ENABLED ENV SET TO FALSE.")
+    if TELEGRAM_ENABLED_ADMIN:
+        print_log("TELEGRAM_ENABLED_ADMIN ENV SET TO TRUE.")
+    else:
+        print_log("TELEGRAM_ENABLED_ADMIN ENV SET TO FALSE.")
+    TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', 'NO_TOKEN_SET')
+    TELEGRAM_RECIPIENTS = [item.strip() for item in os.environ.get('TELEGRAM_RECIPIENTS', '').split(',') if item.strip()]
+    TELEGRAM_RECIPIENTS_ADMIN = [item.strip() for item in os.environ.get('TELEGRAM_RECIPIENTS_ADMIN', '').split(',') if item.strip()]
 
+    if TELEGRAM_BOT_TOKEN == 'NO_TOKEN_SET':
+        TELEGRAM_ENABLED = False
+        TELEGRAM_ENABLED_ADMIN = False
+        print_log("TELEGRAM_BOT_TOKEN NOT SET! DISABLED TELEGRAM NOTIFICATION.")
+    else:
+        print_log("TELEGRAM BOT TOKEN SET.")
+        if not TELEGRAM_RECIPIENTS:
+            print_log("TELEGRAM_RECIPIENTS NOT SET!")
+            TELEGRAM_ENABLED = False
+        else:
+            print_log(f"TELEGRAM RECIPIENTS: {', '.join(TELEGRAM_RECIPIENTS)}")
+
+        if not TELEGRAM_RECIPIENTS_ADMIN:
+            TELEGRAM_ENABLED_ADMIN = False
+            print_log("TELEGRAM_RECIPIENTS_ADMIN NOT SET! DISABLED ADMIN TELEGRAM NOTIFICATION.")
+        else:
+            print_log(f"TELEGRAM ADMIN RECIPIENTS: {', '.join(TELEGRAM_RECIPIENTS_ADMIN)}")
+        if TELEGRAM_ENABLED or TELEGRAM_ENABLED_ADMIN:
+            TELEGRAM_BOT = telepot.Bot(TELEGRAM_BOT_TOKEN)
+else:
+    print_log("TELEGRAM_ENABLED & TELEGRAM_ENABLED_ADMIN ENV SET TO FALSE. DISABLED TELEGRAM NOTIFICATION.")
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = SECRET_KEY
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_IMAGE_SIZE_MB * 1024 * 1024
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True, "pool_recycle": 300}
@@ -100,6 +120,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = None  # Suppress default login flash
+
 
 # --- CSRF protection (session token) ---
 def _get_csrf_token() -> str:
@@ -216,28 +237,47 @@ def save_receipt_image(file_storage) -> Optional[str]:
     file_storage.save(os.path.join(app.config['UPLOAD_FOLDER'], stored))
     return stored
 
-def send_telegram_message(type="", user="", action="", details=""):
-    if TELEGRAM_ENABLED:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if type == "auditlog":
-            message = f"{timestamp}\nUser: {user}\nAction: {action}\nDetails: {details}"
-        else:
-            message = f"{timestamp}\n{type}"
-        for recipient in TELEGRAM_RECIPIENTS:
+def send_telegram_message(msg_type="", user="", action="", details=""):
+    def send_message(recipients, message):
+        for recipient in recipients:
             try:
                 TELEGRAM_BOT.sendMessage(recipient, message)
-            except Exception:
+            except Exception as e:
+                print_log(f"Telegram send failed for {recipient}: {e}")
                 continue
-    else:
+    if not TELEGRAM_ENABLED and not TELEGRAM_ENABLED_ADMIN:
         return
-    return
+    else:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if msg_type == "auditlog":
+            message = f"{timestamp}\nUser: {user}\nAction: {action}\nDetails: {details}"
+            if "transaction" in action.lower() or "advance settlement" in action.lower():
+                to_notify = "all"
+            else:
+                to_notify = "admin"
+        else:
+            message = f"{timestamp}\n{msg_type}"
+            to_notify = "admin"
+        
+        if to_notify == "all":
+            recipients = []
+            if TELEGRAM_ENABLED:
+                recipients.extend(TELEGRAM_RECIPIENTS)
+            if TELEGRAM_ENABLED_ADMIN:
+                recipients.extend(TELEGRAM_RECIPIENTS_ADMIN)
+            if recipients:
+                send_message(list(set(recipients)), message)
+        elif to_notify == "admin" and TELEGRAM_ENABLED_ADMIN:
+                send_message(TELEGRAM_RECIPIENTS_ADMIN, message)
+        return
 
 def log_action(action: str, details: str):
     log = AuditLog(user=current_user.username if current_user.is_authenticated else "System",
                    action=action, details=details)
     db.session.add(log)
     db.session.commit()
-    send_telegram_message(type="auditlog", user=log.user, action=action, details=details)
+    send_telegram_message(msg_type="auditlog", user=log.user, action=action, details=details)
+
 # --- Balance helpers ---
 def get_bank_balance() -> float:
     txs = Transaction.query.all()
