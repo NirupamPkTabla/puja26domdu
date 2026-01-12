@@ -327,7 +327,8 @@
       </div>
     {% else %}
       <button type="button" class="fab" data-bs-toggle="modal" data-bs-target="#newTxModal">+</button>
-      <div class="modal fade" id="newTxModal" tabindex="-1" aria-labelledby="newTxLabel" aria-hidden="true">
+      <div class="modal fade" id="newTxModal" tabindex="-1" aria-labelledby="newTxLabel" aria-hidden="true"
+     data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -546,6 +547,19 @@
             addSpendRow();
             calcSettlement();
             document.getElementById('mainAmount').focus();
+          });
+        }
+        const txForm = document.querySelector('#newTxModal form');
+        if (txForm) {
+          txForm.addEventListener('submit', function(e) {
+            const submitBtn = this.querySelector('.btn-action');
+            if (submitBtn.disabled) {
+              e.preventDefault(); // Already submitting
+              return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+            // No need to reset form here — the redirect on success will reload the page and clear everything
           });
         }
       </script>
